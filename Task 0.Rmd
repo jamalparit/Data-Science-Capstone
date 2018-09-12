@@ -1,0 +1,59 @@
+---
+title: "Data Science Capstone"
+author: "Ismail Che Ani"
+date: "September 13, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r , warning=FALSE, message = FALSE, echo=TRUE}
+install.packages("tm", repos = "http://cran.us.r-project.org")
+## Installing package into '/Users/victoriadotta/Library/R/3.3/library'
+## (as 'lib' is unspecified)
+## 
+## The downloaded binary packages are in
+##  /var/folders/st/zr32ms157s336zw_znx_l5140000gn/T//Rtmpq3qAbc/downloaded_packages
+library(tm)
+```
+```{r setup, include=FALSE}
+## Loading required package: NLP
+install.packages("wordcloud", repos = "http://cran.us.r-project.org")
+## Installing package into '/Users/victoriadotta/Library/R/3.3/library'
+## (as 'lib' is unspecified)
+## 
+## The downloaded binary packages are in
+##  /var/folders/st/zr32ms157s336zw_znx_l5140000gn/T//Rtmpq3qAbc/downloaded_packages
+library(wordcloud)
+## Loading required package: RColorBrewer
+install.packages("stringi", repos = "http://cran.us.r-project.org")
+## Installing package into '/Users/victoriadotta/Library/R/3.3/library'
+## (as 'lib' is unspecified)
+## 
+## The downloaded binary packages are in
+##  /var/folders/st/zr32ms157s336zw_znx_l5140000gn/T//Rtmpq3qAbc/downloaded_packages
+library(stringi)
+```
+## Task 0: Understanding the Problem
+Tasks to accomplish:
+
+What data we have.
+
+What are the standard tools and models used for that type of data.
+
+The data is from a corpus called HC Corpora (www.corpora.heliohost.org). See the readme file at http://www.corpora.heliohost.org/aboutcorpus.html for details on the corpora available. The files have been language filtered but may still contain some foreign text.
+
+We are going to use the english dataset which contains three files.
+
+##0.1 Loading the data
+
+```{r , warning=FALSE, message = FALSE, echo=TRUE}
+setwd("D:/OneDrive/Public/Data Science/Coursera/Capstone/")
+blogs <- readLines("en_US.blogs.txt", encoding = "UTF-8", skipNul=TRUE)
+news <- readLines("en_US.news.txt", encoding = "UTF-8", skipNul = TRUE)
+twitter <- readLines("en_US.twitter.txt", encoding = "UTF-8", skipNul = TRUE)
+```
+```{r , warning=FALSE, message = FALSE, echo=TRUE}
+
+```
