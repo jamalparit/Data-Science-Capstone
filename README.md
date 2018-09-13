@@ -5,7 +5,7 @@ A Shiny App for predicting the next word in a string.
 [The App](https://mblackmo.shinyapps.io/ngram_match/)  
 
 ### The Project
-[Project Overview](00_project_overview.md)  
+[Project Overview](Project_Overview.md)  
 [Sylllabus](00_syllabus.md)  
 
 ### Project Tasks - Instructions
