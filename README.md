@@ -6,7 +6,7 @@ A Shiny App for predicting the next word in a string.
 
 ### The Project
 [Project Overview](Project_Overview.md)  
-[Sylllabus](00_syllabus.md)  
+[Sylllabus](syllabus.md)  
 
 ### Project Tasks - Instructions
 [Task 0: Understanding the Problem](00_Task.md)  
