@@ -5,6 +5,9 @@ date: "September 13, 2018"
 output: html_document
 ---
 
+Project Overview
+================
+
 Around the world, people are spending an increasing amount of time on their mobile devices for email, social networking, banking and a whole range of other activities. But typing on mobile devices can be a serious pain. SwiftKey, our corporate partner in this capstone, builds a smart keyboard that makes it easier for people to type on their mobile devices. One cornerstone of their smart keyboard is predictive text models. When someone types:
 
 I went to the
@@ -25,7 +28,6 @@ During the capstone you can get support from your fellow students, from us, and 
 We have compiled some basic natural language processing resources below. You are welcome to use these resources or any others you can find while performing this analysis. One thing to keep in mind is that we do not expect you to become a world's expert in natural language processing. The point of this capstone is for you to show you can explore a new data type, quickly get up to speed on a new application, and implement a useful model in a reasonable period of time. We think NLP is very cool and depending on your future goals may be worth studying more in-depth, but you can complete this project by using your general knowledge of data science and basic knowledge of NLP.
 
 Here are a few resources that might be good places to start as you tackle this ambitious project.
-
-Text mining infrastucture in R
-CRAN Task View: Natural Language Processing
-Videos and Slides from Stanford Natural Language Processing course
+-   [Text mining infrastucture in R](%22http://www.jstatsoft.org/v25/i05/%22)
+-   [CRAN Task View: Natural Language Processing](%22http://cran.r-project.org/web/views/NaturalLanguageProcessing.html%22)
+-   [Videos](%22https://www.youtube.com/user/OpenCourseOnline/search?query=NLP%22) and [Slides](%22https://web.stanford.edu/~jurafsky/NLPCourseraSlides.html%22) from Stanford Natural Language Processing course
