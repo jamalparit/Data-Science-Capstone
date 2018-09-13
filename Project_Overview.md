@@ -2,7 +2,7 @@
 title: "Project Overview"
 author: "Ismail Che Ani"
 date: "September 13, 2018"
-output: html_document
+output: pdf
 ---
 
 Project Overview
