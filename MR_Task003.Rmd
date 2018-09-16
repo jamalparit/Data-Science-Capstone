@@ -1,0 +1,199 @@
+---
+title: 'Coursera Data Science Capstone: Milestone Report'
+author: "Ismail Che Ani"
+date: "September 16, 2018"
+output: html_document
+---
+
+```{r setup, message = FALSE, include=FALSE,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introductions
+
+The goal of this project is just to display that you’ve gotten used to working with the data and that you are on track to create your prediction algorithm. Please submit a report on R Pubs (http://rpubs.com/) that explains your exploratory analysis and your goals for the eventual app and algorithm. This document should be concise and explain only the major features of the data you have identified and briefly summarize your plans for creating the prediction algorithm and Shiny app in a way that would be understandable to a non-data scientist manager. You should make use of tables and plots to illustrate important summaries of the data set. The motivation for this project is to: 
+
+1. Demonstrate that you’ve downloaded the data and have successfully loaded it in.
+2. Create a basic report of summary statistics about the data sets.
+3. Report any interesting findings that you amassed so far.
+4. Get feedback on your plans for creating a prediction algorithm and Shiny app.
+
+### Review criteria
+1. Does the link lead to an HTML page describing the exploratory analysis of the training data set? 
+2. Has the data scientist done basic summaries of the three files? 
+3. Word counts, line counts and basic data tables? 
+4. Has the data scientist made basic plots, such as histograms to illustrate features of the data? 
+5. Was the report written in a brief, concise style, in a way that a non-data scientist manager could appreciate?
+
+
+##Evaluation criteria 1:
+###Does the link lead to an HTML page describing the exploratory analysis of the training data set? 
+**Yes, the link leads to this HTML document, which describes the exploratory analysis in below spaces.**
+
+## Getting the data
+
+```{r load_module, echo=FALSE, message = FALSE, warning=FALSE}
+
+## Load CRAN modules 
+
+library(plyr);
+library(dplyr)
+library(knitr)
+library(tm)
+
+## Step 1: Download the dataset and unzip folder
+## Check if directory already exists?
+if(!file.exists("./final")){
+  dir.create("./final")
+}
+Url <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
+## Check if zip has already been downloaded in final directory?
+if(!file.exists("./final/Coursera-SwiftKey.zip")){
+  download.file(Url,destfile="./final/Coursera-SwiftKey.zip",mode = "wb")
+}
+## Check if zip has already been unzipped?
+if(!file.exists("./final")){
+  unzip(zipfile="./final/Coursera-SwiftKey.zip",exdir="./final")
+}
+``` 
+
+The database are downloaded from  https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
+The data is from a corpus called HC Corpora (www.corpora.heliohost.org). In linguistics, a corpus (plural corpora) or text corpus is a large and structured set of texts. For this exercise, myself will using the English sets.
+
+##Evaluation criteria 2: 
+###Has the data scientist done basic summaries of the three files?
+**Myself has evaluated basic summaries of the data such as word and line counts**
+
+All the files list in ("/final/en_US Dataset folder") and the data sets consist of text from 3 different sources: 1) News, 2) Blogs and 3) Twitter feeds. So let begin
+
+```{r read_list, echo=FALSE, warning=FALSE}
+path <- file.path("./final" , "en_US")
+files<-list.files(path, recursive=TRUE)
+# Lets make a file connection of the twitter data set
+con <- file("./final/en_US/en_US.twitter.txt", "r") 
+#lineTwitter<-readLines(con,encoding = "UTF-8", skipNul = TRUE)
+lineTwitter<-readLines(con, skipNul = TRUE)
+# Close the connection handle when you are done
+close(con)
+# Lets make a file connection of the blog data set
+con <- file("./final/en_US/en_US.blogs.txt", "r") 
+#lineBlogs<-readLines(con,encoding = "UTF-8", skipNul = TRUE)
+lineBlogs<-readLines(con, skipNul = TRUE)
+# Close the connection handle when you are done
+close(con)
+# Lets make a file connection of the news data set
+con <- file("./final/en_US/en_US.news.txt", "r") 
+#lineNews<-readLines(con,encoding = "UTF-8", skipNul = TRUE)
+lineNews<-readLines(con, skipNul = TRUE)
+# Close the connection handle when you are done
+close(con)
+```
+Examine the data sets and summarize our findings (file sizes, line counts, word counts, and mean words per line) below.
+```{r word_count, echo=FALSE, warning=FALSE}
+library(stringi)
+# Get file sizes
+lineBlogs.size <- file.info("./final/en_US/en_US.blogs.txt")$size / 1024 ^ 2
+lineNews.size <- file.info("./final/en_US/en_US.news.txt")$size / 1024 ^ 2
+lineTwitter.size <- file.info("./final/en_US/en_US.twitter.txt")$size / 1024 ^ 2
+
+# Get words in files
+lineBlogs.words <- stri_count_words(lineBlogs)
+lineNews.words <- stri_count_words(lineNews)
+lineTwitter.words <- stri_count_words(lineTwitter)
+
+# Summary of the data sets
+data.frame(source = c("blogs", "news", "twitter"),
+           file.size.MB = c(lineBlogs.size, lineNews.size, lineTwitter.size),
+           num.lines = c(length(lineBlogs), length(lineNews), length(lineTwitter)),
+           num.words = c(sum(lineBlogs.words), sum(lineNews.words), sum(lineTwitter.words)),
+           mean.num.words = c(mean(lineBlogs.words), mean(lineNews.words), mean(lineTwitter.words)))
+
+```
+
+## Cleaning The Data
+Before performing exploratory analysis, we must clean the data first. This involves removing URLs, special characters, punctuations, numbers, excess whitespace, stopwords, and changing the text to lower case. Since the data sets are quite large, we will randomly choose 2% of the data to demonstrate the data cleaning and exploratory analysis also please take care of the UTF chars.
+
+```{r clean_data, echo=FALSE, warning=FALSE}
+library(tm)
+# Sample the data
+set.seed(5000)
+data.sample <- c(sample(lineBlogs, length(lineBlogs) * 0.02),
+                 sample(lineNews, length(lineNews) * 0.02),
+                 sample(lineTwitter, length(lineTwitter) * 0.02))
+
+# Create corpus and clean the data
+corpus <- VCorpus(VectorSource(data.sample))
+toSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
+corpus <- tm_map(corpus, toSpace, "(f|ht)tp(s?)://(.*)[.][a-z]+")
+corpus <- tm_map(corpus, toSpace, "@[^\\s]+")
+corpus <- tm_map(corpus, tolower)
+corpus <- tm_map(corpus, removeWords, stopwords("en"))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, PlainTextDocument)
+```
+
+##Exploratory Analysis
+Now tine to do some exploratory analysis on the data. It would be interesting and helpful to find the most frequently occurring words in the data. Here we list the most common (n-grams) uni-grams, bi-grams, and tri-grams.
+
+```{r exploratory_analysis, echo=FALSE, warning=FALSE}
+
+library(RWeka)
+library(ggplot2)
+##annotate
+options(mc.cores=1)
+# we'll get the frequencies of the word
+getFreq <- function(tdm) {
+  freq <- sort(rowSums(as.matrix(tdm)), decreasing = TRUE)
+  return(data.frame(word = names(freq), freq = freq))
+}
+bigram <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
+trigram <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
+makePlot <- function(data, label) {
+  ggplot(data[1:30,], aes(reorder(word, -freq), freq)) +
+         labs(x = label, y = "Frequency") +
+         theme(axis.text.x = element_text(angle = 60, size = 12, hjust = 1)) +
+         geom_bar(stat = "identity", fill = I("blue"))
+}
+
+# Get frequencies of most common n-grams in data sample
+freq1 <- getFreq(removeSparseTerms(TermDocumentMatrix(corpus), 0.9999))
+freq2 <- getFreq(removeSparseTerms(TermDocumentMatrix(corpus, control = list(tokenize = bigram)), 0.9999))
+freq3 <- getFreq(removeSparseTerms(TermDocumentMatrix(corpus, control = list(tokenize = trigram)), 0.9999))
+```
+
+##Evaluation criteria 3: 
+###Has the data scientist made basic plots, such as histograms to illustrate features of the data?
+**Myself has made basic plots, such as histograms to illustrate features of the data** and
+Here is a histogram of the 30 most common unigrams in the data sample.
+
+```{r histogram_1, echo=FALSE}
+makePlot(freq1, "30 Most Common Uni-grams")
+```
+
+Here is a histogram of the 30 most common bigrams in the data sample.
+
+```{r histogram_2, echo=FALSE}
+makePlot(freq2, "30 Most Common Bi-grams")
+```
+
+Here is a histogram of the 30 most common trigrams in the data sample.
+```{r histogram_3, echo=FALSE}
+
+makePlot(freq3, "30 Most Common Tri-grams")
+```
+
+##Conclusion
+Feedback on our plans for creating a prediction algorithm and Shiny app From the exploratory analysis is:
+
+a. To finalize our predictive algorithm
+b. A Shiny app can be deploy from the algorithm
+
+The predictive algorithm are using n-gram model similar as above.The strategy is to  use the trigram model to predict the next word. If no matching trigram can be found, then the algorithm would back off to the bigram model, and then to the unigram model if needed.
+
+The Shiny app we develop using algorithm to suggest the most likely next word and an input text is prepared for the user to enter the phrase in textbox. As result user will get what is the next words.
+
+##Evaluation criteria 4: 
+Was the report written in a brief, concise style, in a way that a non-data scientist manager could appreciate? 
+
+I hope the report could be understood by a non data scientist and is brief and concise.
